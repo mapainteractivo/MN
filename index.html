@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mapa Interactivo · La Mama Negra (Latacunga)</title>
+<style>
+:root{
+  --rojo:#c8102e;
+  --amarillo:#f1c40f;
+  --negro:#111;
+  --blanco:#fff;
+  --dorado:#d4af37;
+  --fondo:#fbfaf8;
+  --card:#fff;
+  --muted:#666;
+  --accent:#c8102e;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background:var(--fondo); color:var(--negro);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  min-height:100vh;
+}
+/* Topbar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--rojo);color:var(--blanco);
+  box-shadow:0 4px 14px rgba(0,0,0,0.12)
+}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{
+  width:46px;height:46px;border-radius:8px;background:var(--blanco);color:var(--rojo);display:flex;align-items:center;justify-content:center;font-weight:800;
+  box-shadow:0 6px 18px rgba(0,0,0,0.12)
+}
+.title{font-weight:700}
+.top-actions{display:flex;gap:8px}
+/* Layout */
+.wrap{max-width:1200px;margin:18px auto;padding:12px;display:grid;grid-template-columns:320px 1fr;gap:18px}
+@media (max-width:980px){.wrap{grid-template-columns:1fr; padding:12px} .sidebar{order:2} .map-area{order:1}}
+/* Sidebar */
+.sidebar{
+  background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.06);height:calc(100vh - 150px);overflow:auto;
+}
+.search{display:flex;gap:8px;margin-bottom:10px}
+.search input{flex:1;padding:8px;border-radius:8px;border:1px solid #eee}
+.menu-list{display:flex;flex-direction:column;gap:8px}
+.menu-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;cursor:pointer;border-left:6px solid transparent;transition:all .14s}
+.menu-item:hover{transform:translateX(4px)}
+.menu-item.active{border-left-color:var(--rojo);background:rgba(200,16,46,0.04)}
+.mi-ico{width:44px;height:44;border-radius:8px;background:#faf7f5;border:1px solid #f0eceb;display:flex;align-items:center;justify-content:center}
+/* Map area */
+.map-area{min-height:60vh;background:transparent}
+.map-card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 10px 30px rgba(0,0,0,0.06);overflow:hidden}
+.map-wrapper{position:relative;border-radius:8px;overflow:hidden;border:1px solid #eee}
+.map-image{display:block;width:100%;height:70vh;object-fit:cover;filter:contrast(1);}
+/* markers: using percentages so they are responsive */
+.marker{
+  position:absolute;transform:translate(-50%,-100%);width:36px;height:36px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  border:3px solid var(--card);
+}
+.marker.red{background:var(--rojo)}
+.marker.gold{background:var(--dorado);color:#111}
+.marker.black{background:#111}
+/* popup */
+.popup{
+  position:absolute;background:var(--card);box-shadow:0 12px 40px rgba(0,0,0,0.18);border-radius:10px;padding:12px;width:320px;
+  transform-origin:top left;z-index:60;border:2px solid rgba(0,0,0,0.06)
+}
+.popup h4{margin:0 0 8px 0}
+.popup .desc{font-size:0.95rem;color:var(--muted);margin-bottom:8px}
+.popup img{width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:8px}
+.popup .actions{display:flex;gap:8px;justify-content:space-between}
+/* timeline (bottom) */
+.timeline-row{margin-top:12px;background:var(--card);padding:10px;border-radius:10px;display:flex;gap:10px;align-items:center;overflow:auto}
+.tl-item{min-width:150px;padding:8px;border-radius:8px;border:1px solid #f1eee9;background:#fff}
+.tl-year{font-weight:800;color:var(--accent);}
+/* small */
+.badge{display:inline-block;padding:6px 8px;border-radius:999px;background:var(--amarillo);font-weight:700;margin-right:8px}
+.meta{color:var(--muted);font-size:0.95rem}
+.footer{margin-top:12px;text-align:center;color:var(--muted);font-size:0.9rem}
+/* modal lightbox */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .15s;z-index:1000}
+.modal.show{visibility:visible;opacity:1}
+.modal .box{max-width:92%;max-height:92%}
+.modal img{max-width:100%;max-height:90vh;border-radius:8px;display:block}
+.close-x{position:absolute;right:18px;top:18px;background:#fff;border-radius:8px;padding:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.14)}
+.small-muted{font-size:0.9rem;color:var(--muted)}
+
+/* Modal flotante para "Más" */
+.info-modal{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:24px;
+  max-width:600px;
+  width:90%;
+  max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  z-index:2000;
+  visibility:hidden;
+  opacity:0;
+  transition:opacity .2s;
+}
+.info-modal.show{
+  visibility:visible;
+  opacity:1;
+}
+.info-modal h2{
+  margin:0 0 16px 0;
+  color:var(--rojo);
+}
+.info-modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:1999;
+  visibility:hidden;
+  opacity:0;
+  transition:opacity .2s;
+}
+.info-modal-overlay.show{
+  visibility:visible;
+  opacity:1;
+}
+.info-modal-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:transparent;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  color:var(--muted);
+  padding:4px 8px;
+}
+.info-modal-close:hover{
+  color:var(--negro);
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">MN</div>
+    <div>
+      <div class="title">Fiesta de la Mama Negra</div>
+      <div style="font-size:0.85rem;opacity:.9">Mapa interactivo · Latacunga</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="ttsBtn" class="icon-btn" style="background:transparent;border:none;color:#fff">🔊 Leer</button>
+    <button id="printBtn" class="icon-btn" style="background:transparent;border:none;color:#fff">🖨 Imprimir</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Navegación del mapa">
+    <div class="search">
+      <input id="search" placeholder="Buscar marcador..." aria-label="Buscar marcador">
+    </div>
+    <div class="menu-list" id="menuList">
+      <div class="menu-item active" data-id="origin" tabindex="0">
+        <div class="mi-ico">📜</div>
+        <div><div style="font-weight:700">Origen & Significado</div><div class="small-muted">Erupción Cotopaxi, mestizaje</div></div>
+      </div>
+      <div class="menu-item" data-id="plaza" tabindex="0">
+        <div class="mi-ico">🏛️</div>
+        <div><div style="font-weight:700">Plaza Principal</div><div class="small-muted">Centro de eventos y procesiones</div></div>
+      </div>
+      <div class="menu-item" data-id="mercados" tabindex="0">
+        <div class="mi-ico">🛍️</div>
+        <div><div style="font-weight:700">Mercados (vivanderas)</div><div class="small-muted">La Merced y El Salto</div></div>
+      </div>
+      <div class="menu-item" data-id="huacos" tabindex="0">
+        <div class="mi-ico">🍃</div>
+        <div><div style="font-weight:700">Huacos & Limpias</div><div class="small-muted">Ritos de purificación</div></div>
+      </div>
+      <div class="menu-item" data-id="ashanga" tabindex="0">
+        <div class="mi-ico">🥘</div>
+        <div><div style="font-weight:700">Ashanga (ofrendas)</div><div class="small-muted">Cuyes, cerdo, aves</div></div>
+      </div>
+      <div class="menu-item" data-id="salv" tabindex="0">
+        <div class="mi-ico">🛡️</div>
+        <div><div style="font-weight:700">Salvaguardia</div><div class="small-muted">Educación, documentación</div></div>
+      </div>
+    </div>
+    <div style="margin-top:12px" class="card small">
+      <div style="font-weight:700;margin-bottom:6px">Leyenda</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px;align-items:center"><div style="width:12px;height:12px;background:var(--rojo);border-radius:6px"></div><div class="small-muted">Principal</div></div>
+        <div style="display:flex;gap:6px;align-items:center"><div style="width:12px;height:12px;background:var(--dorado);border-radius:6px"></div><div class="small-muted">Ritual / Ofrenda</div></div>
+        <div style="display:flex;gap:6px;align-items:center"><div style="width:12px;height:12px;background:#111;border-radius:6px"></div><div class="small-muted">Cultural</div></div>
+      </div>
+    </div>
+    <div style="margin-top:10px" class="small-muted">
+      <strong>Instrucciones:</strong> Haz clic en un marcador del mapa o en un elemento de la lista para ver la información.
+    </div>
+  </aside>
+
+  <!-- Map & Content -->
+  <section class="map-area">
+    <div class="map-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div><strong>Latacunga — Puntos de Interés</strong><div class="small-muted">Haz clic en los marcadores</div></div>
+        <div class="meta">Mapa interactivo</div>
+      </div>
+
+      <div class="map-wrapper" id="mapWrapper" aria-label="Mapa de Latacunga">
+        <!-- Aquí debes agregar tu imagen de mapa local -->
+        <img id="mapImg" class="map-image" src="imgs/mapa.png" alt="Mapa de Latacunga">
+        
+        <div class="marker red" data-id="origin" style="left:50%;top:28%;">1</div>
+        <div class="marker gold" data-id="plaza" style="left:49%;top:44%;">2</div>
+        <div class="marker black" data-id="mercados" style="left:58%;top:52%;">3</div>
+        <div class="marker gold" data-id="huacos" style="left:36%;top:56%;">4</div>
+        <div class="marker red" data-id="ashanga" style="left:68%;top:36%;">5</div>
+        <div class="marker black" data-id="salv" style="left:24%;top:36%;">6</div>
+
+        <div id="popup" class="popup" style="display:none" role="dialog" aria-hidden="true">
+          <h4 id="popupTitle">Título</h4>
+          <div class="desc" id="popupDesc">Descripción breve...</div>
+          <img id="popupImg" src="" alt="" style="display:none">
+          <div class="actions">
+            <div><button id="openLightbox" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer">🔍 Ver imagen</button></div>
+            <div style="text-align:right"><button id="moreBtn" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer">Más</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- timeline -->
+      <div class="timeline-row" aria-hidden="false">
+        <div class="tl-item"><div class="tl-year">1742</div><div class="small-muted">Erupción del Cotopaxi y promesa a la Virgen</div></div>
+        <div class="tl-item"><div class="tl-year">Siglos XVIII-XIX</div><div class="small-muted">Influencia africana y andina</div></div>
+        <div class="tl-item"><div class="tl-year">1963</div><div class="small-muted">Institucionalización (noviembre)</div></div>
+      </div>
+
+      <div class="footer">Grupo 11.</div>
+    </div>
+  </section>
+</div>
+
+<!-- Lightbox modal -->
+<div id="modal" class="modal" role="dialog" aria-hidden="true">
+  <div class="box"><img id="modalImg" src="" alt="Imagen ampliada"></div>
+  <div class="close-x" id="closeModal">✕</div>
+</div>
+
+<!-- Modal flotante para información adicional -->
+<div class="info-modal-overlay" id="infoModalOverlay"></div>
+<div class="info-modal" id="infoModal">
+  <button class="info-modal-close" id="infoModalClose">✕</button>
+  <h2 id="infoModalTitle">Título</h2>
+  <div id="infoModalContent"></div>
+</div>
+
+<script>
+const POINTS = {
+  origin: {
+    title: 'Origen e Historia',
+    desc: `La Fiesta de la Mama Negra surge como mezcla de tradiciones tras la erupción del Cotopaxi (1742). Incluye elementos españoles, africanos e indígenas; la figura del Huaco representa ritos de purificación.`,
+    img: 'https://www.turisec.com/wp-content/uploads/2022/10/PERSONAJES-DE-LA-MAMA-NEGRA.jpg',
+    more: `<p><strong>Contexto:</strong> Durante la colonia se introdujo población africana y se mezclaron prácticas religiosas con ritos andinos. La promesa a la Virgen de la Merced explica la celebración anual.</p>`
+  },
+  plaza: {
+    title: 'Plaza Principal',
+    desc: `Corazón de las procesiones y eventos cívicos. Aquí convergen comparsas, bandas y la ashanga.`,
+    img: 'https://thumbs.dreamstime.com/b/iglesia-y-letrero-latacunga-ecuador-de-merced-117897858.jpg',
+    more: `<p>La plaza es escenario de ceremonias, presentaciones y concentraciones masivas durante las fechas principales.</p>`
+  },
+  mercados: {
+    title: 'Mercados: Vivanderas',
+    desc: `Las vivanderas de La Merced y El Salto organizan la fiesta de septiembre; coordinan las ofrendas y la logística comunitaria.`,
+    img: 'https://www.quitoinforma.gob.ec/wp-content/uploads/2024/10/4954052383332217808-e1729627439417-800x445.jpg',
+    more: `<p>Las vivanderas son pieza clave en la preservación: mantienen recetas, tradiciones y financian partes de la festividad.</p>`
+  },
+  huacos: {
+    title: 'Huacos (Limpias)',
+    desc: `Los Huacos realizan limpias con aguardiente y humo para purificar a los asistentes — un rito andino de sanación colectiva.`,
+    img: 'https://www.mamanegra.com.ec/assets/img/blog-img/huacos.jpg',
+    more: `<p>Estas figuras encarnan el aspecto prehispánico de la fiesta y realizan rituales para prevenir epidemias.</p>`
+  },
+  ashanga: {
+    title: 'Ashanga (ofrendas)',
+    desc: `La ashanga contiene ofrendas: cerdo horneado, aves, cuyes, frutas y licores; es llevada por los ashangueros como presente a la Virgen.`,
+    img: 'https://www.mamanegra.com.ec/assets/img/blog-img/ashangero.jpg',
+    more: `<p>La ashanga simboliza la abundancia y la generosidad comunitaria; es central en la procesión.</p>`
+  },
+  salv: {
+    title: 'Salvaguardia',
+    desc: `Estrategias de preservación: documentación, talleres, educación y turismo responsable. La comunidad es el principal guardián.`,
+    img: 'https://cotopaxi-travel.com/blog/wp-content/uploads/2021/09/mama-negra-1.jpg',
+    more: `<p>Propuestas: campañas educativas, archivos audiovisuales y participación escolar para transmitir la tradición.</p>`
+  }
+};
+
+const markers = document.querySelectorAll('.marker');
+const popup = document.getElementById('popup');
+const popupTitle = document.getElementById('popupTitle');
+const popupDesc = document.getElementById('popupDesc');
+const popupImg = document.getElementById('popupImg');
+const openLightbox = document.getElementById('openLightbox');
+const moreBtn = document.getElementById('moreBtn');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
+const closeModal = document.getElementById('closeModal');
+const menuItems = document.querySelectorAll('.menu-item');
+const mapWrapper = document.getElementById('mapWrapper');
+const infoModal = document.getElementById('infoModal');
+const infoModalOverlay = document.getElementById('infoModalOverlay');
+const infoModalTitle = document.getElementById('infoModalTitle');
+const infoModalContent = document.getElementById('infoModalContent');
+const infoModalClose = document.getElementById('infoModalClose');
+let currentId = null;
+
+function placePopup(xPct, yPct){
+  const wrapper = mapWrapper.getBoundingClientRect();
+  const left = wrapper.width * (xPct/100);
+  const top = wrapper.height * (yPct/100);
+  popup.style.left = left + 12 + 'px';
+  popup.style.top = top + 12 + 'px';
+  const popupRect = popup.getBoundingClientRect();
+  if(popupRect.right > wrapper.right){
+    popup.style.left = (left - popupRect.width - 12) + 'px';
+  }
+  if(popupRect.bottom > wrapper.bottom){
+    popup.style.top = (top - popupRect.height - 12) + 'px';
+  }
+}
+
+markers.forEach(m => {
+  m.addEventListener('click', () => {
+    const id = m.dataset.id;
+    currentId = id;
+    showPoint(id);
+    menuItems.forEach(mi => mi.classList.toggle('active', mi.dataset.id === id));
+    const left = parseFloat(m.style.left);
+    const top = parseFloat(m.style.top);
+    popup.style.display = 'block';
+    popup.setAttribute('aria-hidden','false');
+    setTimeout(() => placePopup(left, top), 0);
+  });
+});
+
+function showPoint(id){
+  const data = POINTS[id];
+  if(!data) return;
+  popupTitle.textContent = data.title;
+  popupDesc.textContent = data.desc;
+  if(data.img){
+    popupImg.src = data.img;
+    popupImg.style.display = 'block';
+  } else {
+    popupImg.style.display = 'none';
+  }
+  moreBtn.dataset.more = data.more || '';
+}
+
+menuItems.forEach(mi=>{
+  mi.addEventListener('click',()=>{
+    const id = mi.dataset.id;
+    const m = document.querySelector('.marker[data-id="'+id+'"]');
+    if(m) m.click();
+  });
+  mi.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); mi.click(); }});
+});
+
+openLightbox.addEventListener('click',()=>{
+  if(popupImg.src){
+    modalImg.src = popupImg.src;
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+  }
+});
+closeModal.addEventListener('click', ()=>{ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true') });
+modal.addEventListener('click',(e)=>{ if(e.target===modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true') }});
+
+// Modal flotante para "Más"
+moreBtn.addEventListener('click', ()=>{
+  const content = moreBtn.dataset.more || '<p>Más información no disponible.</p>';
+  infoModalTitle.textContent = popupTitle.textContent;
+  infoModalContent.innerHTML = content;
+  infoModalOverlay.classList.add('show');
+  infoModal.classList.add('show');
+});
+
+infoModalClose.addEventListener('click', ()=>{
+  infoModalOverlay.classList.remove('show');
+  infoModal.classList.remove('show');
+});
+
+infoModalOverlay.addEventListener('click', ()=>{
+  infoModalOverlay.classList.remove('show');
+  infoModal.classList.remove('show');
+});
+
+document.addEventListener('keydown',(e)=>{ 
+  if(e.key==='Escape'){ 
+    modal.classList.remove('show'); 
+    modal.setAttribute('aria-hidden','true');
+    infoModalOverlay.classList.remove('show');
+    infoModal.classList.remove('show');
+  }
+});
+
+document.getElementById('search').addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.menu-item').forEach(mi=>{
+    const text = mi.innerText.toLowerCase();
+    mi.style.display = text.includes(q) ? 'flex' : 'none';
+  });
+});
+
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.marker') && !e.target.closest('.popup') && !e.target.closest('.menu-item')){
+    popup.style.display = 'none';
+    popup.setAttribute('aria-hidden','true');
+    menuItems.forEach(mi=>mi.classList.remove('active'));
+  }
+});
+
+const ttsBtn = document.getElementById('ttsBtn');
+let synth = window.speechSynthesis;
+let utter = null;
+ttsBtn.addEventListener('click', ()=>{
+  if(!synth) return alert('SpeechSynthesis no soportado.');
+  if(utter){ synth.cancel(); utter = null; ttsBtn.textContent = '🔊 Leer'; return; }
+  let text = '';
+  if(currentId && POINTS[currentId]) text = POINTS[currentId].title + '. ' + POINTS[currentId].desc;
+  else text = 'Mapa interactivo de la Fiesta de la Mama Negra. Selecciona un marcador para escuchar su descripción.';
+  utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'es-ES';
+  utter.rate = 1;
+  utter.onend = ()=>{ utter = null; ttsBtn.textContent = '🔊 Leer'; };
+  synth.speak(utter);
+  ttsBtn.textContent = '⏸ Detener';
+});
+
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+
+window.addEventListener('load', ()=>{
+  const defaultMarker = document.querySelector('.marker[data-id="origin"]');
+  if(defaultMarker) defaultMarker.click();
+});
+</script>
+</body>
+</html>
