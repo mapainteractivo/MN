@@ -40,9 +40,12 @@ body{
 /* Layout */
 .wrap{max-width:1200px;margin:18px auto;padding:12px;display:grid;grid-template-columns:320px 1fr;gap:18px}
 @media (max-width:980px){.wrap{grid-template-columns:1fr; padding:12px} .sidebar{order:2} .map-area{order:1}}
+.video-section{margin-top:18px;background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+.video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px}
+.video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%}
 /* Sidebar */
 .sidebar{
-  background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.06);height:calc(100vh - 150px);overflow:auto;
+  background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.06);overflow:auto;
 }
 .search{display:flex;gap:8px;margin-bottom:10px}
 .search input{flex:1;padding:8px;border-radius:8px;border:1px solid #eee}
@@ -55,7 +58,7 @@ body{
 .map-area{min-height:60vh;background:transparent}
 .map-card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 10px 30px rgba(0,0,0,0.06);overflow:hidden}
 .map-wrapper{position:relative;border-radius:8px;overflow:hidden;border:1px solid #eee}
-.map-image{display:block;width:100%;height:70vh;object-fit:cover;filter:contrast(1);}
+.map-image{display:block;width:100%;height:85vh;object-fit:cover;filter:contrast(1);}
 /* markers: using percentages so they are responsive */
 .marker{
   position:absolute;transform:translate(-50%,-100%);width:36px;height:36px;border-radius:999px;
@@ -75,11 +78,6 @@ body{
 .popup .desc{font-size:0.95rem;color:var(--muted);margin-bottom:8px}
 .popup img{width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:8px}
 .popup .actions{display:flex;gap:8px;justify-content:space-between}
-/* timeline (bottom) */
-.timeline-row{margin-top:12px;background:var(--card);padding:10px;border-radius:10px;display:flex;gap:10px;align-items:center;overflow:auto}
-.tl-item{min-width:150px;padding:8px;border-radius:8px;border:1px solid #f1eee9;background:#fff}
-.tl-year{font-weight:800;color:var(--accent);}
-/* small */
 .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:var(--amarillo);font-weight:700;margin-right:8px}
 .meta{color:var(--muted);font-size:0.95rem}
 .footer{margin-top:12px;text-align:center;color:var(--muted);font-size:0.9rem}
@@ -90,6 +88,8 @@ body{
 .modal img{max-width:100%;max-height:90vh;border-radius:8px;display:block}
 .close-x{position:absolute;right:18px;top:18px;background:#fff;border-radius:8px;padding:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.14)}
 .small-muted{font-size:0.9rem;color:var(--muted)}
+.tl-item{padding:10px;border-radius:8px;border:1px solid #f1eee9;background:#fff}
+.tl-year{font-weight:800;color:var(--accent);margin-bottom:4px}
 
 /* Modal flotante para "Más" */
 .info-modal{
@@ -159,8 +159,8 @@ body{
     </div>
   </div>
   <div class="top-actions">
-    <button id="ttsBtn" class="icon-btn" style="background:transparent;border:none;color:#fff">🔊 Leer</button>
-    <button id="printBtn" class="icon-btn" style="background:transparent;border:none;color:#fff">🖨 Imprimir</button>
+    <button id="ttsBtn" class="icon-btn" style="background:transparent;border:none;color:#fff;cursor:pointer">🔊 Leer</button>
+    <button id="printBtn" class="icon-btn" style="background:transparent;border:none;color:#fff;cursor:pointer">🖨 Imprimir</button>
   </div>
 </div>
 
@@ -204,8 +204,37 @@ body{
         <div style="display:flex;gap:6px;align-items:center"><div style="width:12px;height:12px;background:#111;border-radius:6px"></div><div class="small-muted">Cultural</div></div>
       </div>
     </div>
-    <div style="margin-top:10px" class="small-muted">
-      <strong>Instrucciones:</strong> Haz clic en un marcador del mapa o en un elemento de la lista para ver la información.
+
+    <div style="margin-top:14px;padding:12px;background:rgba(200,16,46,0.04);border-radius:10px;border-left:4px solid var(--rojo)">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--rojo)"> Fechas de Celebración</div>
+      <div style="font-size:0.9rem;line-height:1.6">
+        <div style="margin-bottom:8px">
+          <strong>Septiembre (23-24):</strong>
+          <div class="small-muted">Fiesta religiosa y popular organizada por las vivanderas de los mercados</div>
+        </div>
+        <div>
+          <strong>Noviembre (primera semana):</strong>
+          <div class="small-muted">Fiesta cívica oficial desde 1963, organizada por el municipio</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;background:rgba(212,175,55,0.08);border-radius:10px;border-left:4px solid var(--dorado)">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--dorado)">Personajes Principales</div>
+      <div style="font-size:0.85rem;line-height:1.5;color:var(--muted)">
+        <div style="margin-bottom:4px"> <strong>La Mama Negra</strong> - Matriarca africana</div>
+        <div style="margin-bottom:4px"> <strong>El Capitán</strong> - Autoridad colonial</div>
+        <div style="margin-bottom:4px"> <strong>El Rey Moro</strong> - Nobleza indígena</div>
+        <div style="margin-bottom:4px"> <strong>Ángel de la Estrella</strong> - Fe católica</div>
+        <div> <strong>El Abanderado</strong> - Wiphala andina</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;background:#f9f7f5;border-radius:10px">
+      <div style="font-weight:700;margin-bottom:8px">Significado Cultural</div>
+      <div style="font-size:0.85rem;line-height:1.5;color:var(--muted)">
+        La Mama Negra simboliza la <strong>unidad y diversidad</strong> de Latacunga: fusión de culturas indígena, española y africana. Declarada <strong>Patrimonio Cultural Inmaterial</strong> del Estado.
+      </div>
     </div>
   </aside>
 
@@ -233,20 +262,46 @@ body{
           <div class="desc" id="popupDesc">Descripción breve...</div>
           <img id="popupImg" src="" alt="" style="display:none">
           <div class="actions">
-            <div><button id="openLightbox" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer">🔍 Ver imagen</button></div>
-            <div style="text-align:right"><button id="moreBtn" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer">Más</button></div>
+            <div><button id="openLightbox" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer;background:#fff">🔍 Ver imagen</button></div>
+            <div style="text-align:right"><button id="moreBtn" style="padding:8px;border-radius:8px;border:1px solid #eee;cursor:pointer;background:#fff">Más</button></div>
           </div>
         </div>
       </div>
 
-      <!-- timeline -->
-      <div class="timeline-row" aria-hidden="false">
-        <div class="tl-item"><div class="tl-year">1742</div><div class="small-muted">Erupción del Cotopaxi y promesa a la Virgen</div></div>
-        <div class="tl-item"><div class="tl-year">Siglos XVIII-XIX</div><div class="small-muted">Influencia africana y andina</div></div>
-        <div class="tl-item"><div class="tl-year">1963</div><div class="small-muted">Institucionalización (noviembre)</div></div>
+      <!-- Video y línea de tiempo en dos columnas -->
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:18px">
+        <!-- Línea de tiempo a la izquierda -->
+        <div class="video-section" style="margin-top:0">
+          <div style="margin-bottom:12px">
+            <strong>Línea de Tiempo</strong>
+            <div class="small-muted">Historia de la festividad</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="tl-item"><div class="tl-year">1742</div><div class="small-muted">Erupción del Cotopaxi y promesa a la Virgen</div></div>
+            <div class="tl-item"><div class="tl-year">Siglos XVIII-XIX</div><div class="small-muted">Influencia africana y andina</div></div>
+            <div class="tl-item"><div class="tl-year">1963</div><div class="small-muted">Institucionalización (noviembre)</div></div>
+          </div>
+        </div>
+
+        <!-- Video a la derecha -->
+        <div class="video-section" style="margin-top:0">
+          <div style="margin-bottom:12px">
+            <strong>🎥 Video Documental</strong>
+            <div class="small-muted">Descubre la tradición de la Mama Negra</div>
+          </div>
+          <div class="video-wrapper">
+            <iframe 
+              src="https://www.youtube.com/embed/c1otOgkK9hk" 
+              title="Video de la Mama Negra" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
       </div>
 
-      <div class="footer">Grupo 11.</div>
+      <div class="footer">Grupo 11</div>
     </div>
   </section>
 </div>
