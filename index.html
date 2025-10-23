@@ -57,8 +57,13 @@ body{
 /* Map area */
 .map-area{min-height:60vh;background:transparent}
 .map-card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 10px 30px rgba(0,0,0,0.06);overflow:hidden}
-.map-wrapper{position:relative;border-radius:8px;overflow:hidden;border:1px solid #eee}
-.map-image{display:block;width:100%;height:85vh;object-fit:cover;filter:contrast(1);}
+.map-wrapper{position:relative;border-radius:8px;overflow:visible;border:1px solid #eee}
+.map-image{display:block;
+  width:100%;
+  max-height:60vh; /* altura reducida */
+  object-fit:cover;
+  filter:contrast(1);
+}
 /* markers: using percentages so they are responsive */
 .marker{
   position:absolute;transform:translate(-50%,-100%);width:36px;height:36px;border-radius:999px;
@@ -206,7 +211,7 @@ body{
     </div>
 
     <div style="margin-top:14px;padding:12px;background:rgba(200,16,46,0.04);border-radius:10px;border-left:4px solid var(--rojo)">
-      <div style="font-weight:700;margin-bottom:8px;color:var(--rojo)"> Fechas de Celebración</div>
+      <div style="font-weight:700;margin-bottom:8px;color:var(--rojo)">Fechas de Celebración</div>
       <div style="font-size:0.9rem;line-height:1.6">
         <div style="margin-bottom:8px">
           <strong>Septiembre (23-24):</strong>
@@ -222,11 +227,11 @@ body{
     <div style="margin-top:14px;padding:12px;background:rgba(212,175,55,0.08);border-radius:10px;border-left:4px solid var(--dorado)">
       <div style="font-weight:700;margin-bottom:8px;color:var(--dorado)">Personajes Principales</div>
       <div style="font-size:0.85rem;line-height:1.5;color:var(--muted)">
-        <div style="margin-bottom:4px"> <strong>La Mama Negra</strong> - Matriarca africana</div>
-        <div style="margin-bottom:4px"> <strong>El Capitán</strong> - Autoridad colonial</div>
-        <div style="margin-bottom:4px"> <strong>El Rey Moro</strong> - Nobleza indígena</div>
-        <div style="margin-bottom:4px"> <strong>Ángel de la Estrella</strong> - Fe católica</div>
-        <div> <strong>El Abanderado</strong> - Wiphala andina</div>
+        <div style="margin-bottom:4px"><strong>La Mama Negra</strong> - Matriarca africana</div>
+        <div style="margin-bottom:4px"><strong>El Capitán</strong> - Autoridad colonial</div>
+        <div style="margin-bottom:4px"><strong>El Rey Moro</strong> - Nobleza indígena</div>
+        <div style="margin-bottom:4px"><strong>Ángel de la Estrella</strong> - Fe católica</div>
+        <div><strong>El Abanderado</strong> - Wiphala andina</div>
       </div>
     </div>
 
@@ -235,6 +240,9 @@ body{
       <div style="font-size:0.85rem;line-height:1.5;color:var(--muted)">
         La Mama Negra simboliza la <strong>unidad y diversidad</strong> de Latacunga: fusión de culturas indígena, española y africana. Declarada <strong>Patrimonio Cultural Inmaterial</strong> del Estado.
       </div>
+    </div>
+
+    <div style="margin-top:10px" class="small-muted">
     </div>
   </aside>
 
@@ -252,12 +260,12 @@ body{
         
         <div class="marker red" data-id="origin" style="left:50%;top:28%;">1</div>
         <div class="marker gold" data-id="plaza" style="left:49%;top:44%;">2</div>
-        <div class="marker black" data-id="mercados" style="left:58%;top:52%;">3</div>
+        <div class="marker black" data-id="mercados" style="left:58%;top:50%;">3</div>
         <div class="marker gold" data-id="huacos" style="left:36%;top:56%;">4</div>
         <div class="marker red" data-id="ashanga" style="left:68%;top:36%;">5</div>
         <div class="marker black" data-id="salv" style="left:24%;top:36%;">6</div>
 
-        <div id="popup" class="popup" style="display:none" role="dialog" aria-hidden="true">
+        <div id="popup" class="popup" style="display:none" role="dialog" aria-hidden="true">  
           <h4 id="popupTitle">Título</h4>
           <div class="desc" id="popupDesc">Descripción breve...</div>
           <img id="popupImg" src="" alt="" style="display:none">
@@ -268,25 +276,26 @@ body{
         </div>
       </div>
 
-      <!-- Video y línea de tiempo en dos columnas -->
-      <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:18px">
-        <!-- Línea de tiempo a la izquierda -->
+      <!-- Imagen de línea de tiempo y video en dos columnas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
+        <!-- Línea de tiempo (imagen) a la izquierda -->
         <div class="video-section" style="margin-top:0">
           <div style="margin-bottom:12px">
-            <strong>Línea de Tiempo</strong>
-            <div class="small-muted">Historia de la festividad</div>
+            <strong>Línea de Tiempo Histórica</strong>
+            <div class="small-muted">Evolución de la festividad</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="tl-item"><div class="tl-year">1742</div><div class="small-muted">Erupción del Cotopaxi y promesa a la Virgen</div></div>
-            <div class="tl-item"><div class="tl-year">Siglos XVIII-XIX</div><div class="small-muted">Influencia africana y andina</div></div>
-            <div class="tl-item"><div class="tl-year">1963</div><div class="small-muted">Institucionalización (noviembre)</div></div>
+          <div style="border-radius:8px;overflow:hidden;cursor:pointer" id="timelineImageContainer">
+            <img id="timelineImage" src="imgs/linea.png" alt="Línea de Tiempo de la Mama Negra" style="width:100%;height:auto;display:block">
+          </div>
+          <div style="margin-top:10px;text-align:center">
+            <button id="viewTimelineBtn" style="padding:8px 16px;border-radius:8px;border:1px solid #eee;cursor:pointer;background:#fff;font-weight:600">🔍 Ver imagen completa</button>
           </div>
         </div>
 
         <!-- Video a la derecha -->
         <div class="video-section" style="margin-top:0">
           <div style="margin-bottom:12px">
-            <strong>🎥 Video Documental</strong>
+            <strong>Video Documental</strong>
             <div class="small-muted">Descubre la tradición de la Mama Negra</div>
           </div>
           <div class="video-wrapper">
@@ -301,7 +310,7 @@ body{
         </div>
       </div>
 
-      <div class="footer">Grupo 11</div>
+      <div class="footer">Grupo 11.</div>
     </div>
   </section>
 </div>
@@ -507,6 +516,34 @@ document.getElementById('printBtn').addEventListener('click', ()=> window.print(
 window.addEventListener('load', ()=>{
   const defaultMarker = document.querySelector('.marker[data-id="origin"]');
   if(defaultMarker) defaultMarker.click();
+  
+  // Botón para ver la imagen de línea de tiempo
+  const timelineImage = document.getElementById('timelineImage');
+  const viewTimelineBtn = document.getElementById('viewTimelineBtn');
+  const timelineImageContainer = document.getElementById('timelineImageContainer');
+
+  if(viewTimelineBtn){
+    viewTimelineBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      console.log('Botón clickeado'); // para debug
+      if(timelineImage && timelineImage.src){
+        modalImg.src = timelineImage.src;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+      }
+    });
+  }
+
+  // También permite hacer clic en la imagen directamente
+  if(timelineImageContainer){
+    timelineImageContainer.addEventListener('click', ()=>{
+      if(timelineImage && timelineImage.src){
+        modalImg.src = timelineImage.src;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+      }
+    });
+  }
 });
 </script>
 </body>
