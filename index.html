@@ -40,7 +40,7 @@ body{
 /* Layout */
 .wrap{max-width:1200px;margin:18px auto;padding:12px;display:grid;grid-template-columns:320px 1fr;gap:18px}
 @media (max-width:980px){.wrap{grid-template-columns:1fr; padding:12px} .sidebar{order:2} .map-area{order:1}}
-.video-section{margin-top:18px;background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+.video-section{margin-top:20px;background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
 .video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px}
 .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%}
 /* Sidebar */
@@ -56,8 +56,8 @@ body{
 .mi-ico{width:44px;height:44;border-radius:8px;background:#faf7f5;border:1px solid #f0eceb;display:flex;align-items:center;justify-content:center}
 /* Map area */
 .map-area{min-height:60vh;background:transparent}
-.map-card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 10px 30px rgba(0,0,0,0.06);overflow:hidden}
-.map-wrapper{position:relative;border-radius:8px;overflow:visible;border:1px solid #eee}
+.map-card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 10px 30px rgba(0,0,0,0.06);overflow:visible}
+.map-wrapper{position:relative;border-radius:8px;overflow:visible;border:10px solid #eee}
 .map-image{display:block;
   width:100%;
   max-height:60vh; /* altura reducida */
@@ -255,7 +255,6 @@ body{
       </div>
 
       <div class="map-wrapper" id="mapWrapper" aria-label="Mapa de Latacunga">
-        <!-- Aquí debes agregar tu imagen de mapa local -->
         <img id="mapImg" class="map-image" src="imgs/mapa.png" alt="Mapa de Latacunga">
         
         <div class="marker red" data-id="origin" style="left:50%;top:28%;">1</div>
@@ -278,7 +277,7 @@ body{
 
       <!-- Imagen de línea de tiempo y video en dos columnas -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
-        <!-- Línea de tiempo (imagen) a la izquierda -->
+        <!-- Línea de tiempo (imagen) -->
         <div class="video-section" style="margin-top:0">
           <div style="margin-bottom:12px">
             <strong>Línea de Tiempo Histórica</strong>
@@ -300,7 +299,7 @@ body{
           </div>
           <div class="video-wrapper">
             <iframe 
-              src="https://www.youtube.com/embed/c1otOgkK9hk?si=3VlATLB1GLxFIa_G"
+              src="https://www.youtube.com/embed/c1otOgkK9hk"
               title="Video de la Mama Negra" 
               frameborder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -534,7 +533,7 @@ window.addEventListener('load', ()=>{
     });
   }
 
-  // También permite hacer clic en la imagen directamente
+
   if(timelineImageContainer){
     timelineImageContainer.addEventListener('click', ()=>{
       if(timelineImage && timelineImage.src){
